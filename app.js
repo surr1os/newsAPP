@@ -61,13 +61,23 @@ const http = customHttp(
 
 //* UI ELEMENTS
 
+const form = document.forms['newsControls'];
+const countrySelect = form.elements['country'];
+const categorySelect = form.elements['category']
+const searchInput = form.elements['search'];
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  loadNews();
+})
+
 const newsService = (function (){
   const apiUrl = 'https://newsapi.org/v2';
   const apiKey = 'ff95b6e4589740cea5ffe89360375f5e';
 
   return{
-    topHeadLines(country = 'us',cb){
-      http.get(`${apiUrl}/top-headlines?country=${country}&category=technology&apiKey=${apiKey}`,cb)
+    topHeadLines(country = 'us',category,cb){
+      http.get(`${apiUrl}/top-headlines?country=${country}&category=${category}&apiKey=${apiKey}`,cb)
     },
     everything(query, cb){
       http.get(`${apiUrl}/everything?q=${query}&apiKey=${apiKey}`,cb)
@@ -75,14 +85,7 @@ const newsService = (function (){
   }
 })()
 
-const form = document.forms['newsControls'];
-const countrySelect = form.elements['country'];
-const searchInput = form.elements['search'];
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  loadNews();
-})
 
 //  init selects
 document.addEventListener('DOMContentLoaded', function() {
@@ -96,9 +99,11 @@ function loadNews(){
   showLoader()
   const search = searchInput.value;
   const country = countrySelect.value;
+  const category = categorySelect.value;
 
   if(!search){
-    newsService.topHeadLines(country,onGetResponse)
+    newsService.topHeadLines(country,category,onGetResponse)
+
   }else{
     newsService.everything(search,onGetResponse)
   }
